@@ -1,0 +1,62 @@
+NECCDC 2021 – LINUX Systems
+Pace University - BergCyberSec
+
+[INITIAL TASKS]
+Things that can be done when disconnected from the internet. This will be done in conjunction with initial manual threat hunting.
+
+THREAT HUNTING
+Delete pre-installed installed SEIMs and associated directories.
+	Splunk: /opt/splunk and /opt/SplunkForwarder
+	Wazuh: /var/ossec
+	Elastic Stack: /usr/share/elasticsearch, /usr/share/kibana, /usr/share/filebeat,
+	Graylog: /usr/share/graylog-server
+Check crontab configurations for unexpected script triggering.
+	/etc/crontab
+	/var/spool/cron/crontabs
+Check for any malicious aliases of commands in /etc and individual user home directories.
+	/etc/bashrc or /etc/bash.bashrc
+	/home/<user>/.bashrc
+
+IPTABLES CONFIGURATION
+Implement iptables-service and Disable firewalld. Need sudo privileges. 
+systemctl disable firewalld
+yum(apt-get) install iptables-services
+systemctl enable iptables
+systemctl start iptables
+service iptables save
+
+ENSURE IPTABLES RULES PERSIST
+nano /etc/sysconfig/iptables-config
+IPTABLES_SAVE_ON_STOP="yes"
+IPTABLES_SAVE_ON_RESTART="yes"
+Save iptables Rules
+sudo iptables-save
+sudo service iptables save
+View iptables Rules
+sudo iptables -S
+Flush All iptables Rules
+sudo iptables -F
+
+BASH COMMAND LOGGING
+The filename will be different depending on whether it is a RHEL or Debian based Linux distribution.
+sudo nano /etc/bashrc   or   sudo nano /etc/bash.bashrc
+
+Enter the following code as a single line entry at the bottom of the file.
+PROMPT_COMMAND='LAST_COMMAND=$(history 1 | sed 's/-/\\-/') && logger -i -p local5.info -t bash "$USER $(tty): $LAST_COMMAND"'
+
+Reload .bashrc parameters to start command logging.
+sudo . /etc/bashrc (RHEL) or sudo . /etc/bash.bashrc (Debian)
+
+[POST CONNECTION]
+Tasks that can be done once the network firewall reconnects to the internet.
+
+WAZUH AGENT INSTALLATION DEBIAN LINUX
+Installation for the Wazuh Agent on a Debian Base. Enter the proper ip address within ‘ ’
+
+curl -so wazuh-agent.deb https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_4.0.3-1_amd64.deb && sudo WAZUH_MANAGER='wazuh_server_ip_address' dpkg -i ./wazuh-agent.deb
+Wazuh Agent Installation RHEL LINUX
+Installation for the Wazuh Agent on a Red Hat Enterprise Linux Base. Enter the ip address of the wazuh server within the ‘ ‘
+sudo WAZUH_MANAGER='wazuh_server_ip_address' yum install https://packages.wazuh.com/4.x/yum/wazuh-agent-4.0.3-1.x86_64.rpm
+
+START THE WAZUH AGENT SERVICE
+sudo systemctl start wazuh-agent
