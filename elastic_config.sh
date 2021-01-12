@@ -7,7 +7,7 @@ FILEBEAT_CONF=$(cat /etc/filebeat/filebeat.yml)
 NEW_FILEBEAT=$(echo "$FILEBEAT_CONF" | sed 's/ enabled: false/ enabled: true/')
 echo "$NEW_FILEBEAT" > /etc/filebeat/filebeat.yml
 
-#OSSEC_CONF=$(cat /var/ossec/etc/ossec.conf)
+OSSEC_CONF=$(cat /var/ossec/etc/ossec.conf)
 NEW_OSSEC=$(echo "$OSSEC_CONF" | sed 's/<logall>no<\/logall>/<logall>yes<\/logall>/'\
 | sed 's/<logall_json>no<\/logall_json>/<logall_json>yes<\/logall_json>/'\
 | sed 's/<frequency>43200<\/frequency>/<frequency>60<\/frequency>/')
